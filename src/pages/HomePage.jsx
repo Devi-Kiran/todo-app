@@ -1,13 +1,10 @@
-import "./App.css";
-import React, { useEffect, useState } from "react";
+import React, { useState, useEffect } from "react";
 import { BsFillSunFill } from "react-icons/bs";
 import { BsFillMoonFill } from "react-icons/bs";
 import { MdCancel } from "react-icons/md";
-import TodoItem from "../src/components/TodoItem";
-import Home from "./pages/HomePage";
+import TodoItem from "../components/TodoItem";
 
-function App() {
-  const element = document.documentElement;
+function Home() {
   const [darkMode, setDarkMode] = useState(false);
   const [all, setAll] = useState(true);
   const [active, setActive] = useState(false);
@@ -31,16 +28,8 @@ function App() {
     setActive(false);
   }
 
-  useEffect(() => {
-    if(darkMode) {
-      element.classList.add("dark")
-    } else {
-      element.classList.remove("dark")
-    }
-  },[darkMode])
-
   return (
-    <div className="App min-h-screen dark:bg-darkPrimary">
+    <>
       <header
         style={{ backgroundImage: "url('/images/day.jpeg')" }}
         className="h-72 bg-center py-8 md:py-16 px-4"
@@ -107,8 +96,8 @@ function App() {
           </div>
         </div>
       </section>
-    </div>
+    </>
   );
 }
 
-export default App;
+export default Home;
