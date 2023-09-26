@@ -1,112 +1,70 @@
 import "./App.css";
-import React, { useEffect, useState } from "react";
-import { BsFillSunFill } from "react-icons/bs";
-import { BsFillMoonFill } from "react-icons/bs";
-import { MdCancel } from "react-icons/md";
-import TodoItem from "../src/components/TodoItem";
+import React, { useEffect, useState, createContext } from "react";
 import Home from "./pages/HomePage";
+
+export const TodoContext = createContext();
 
 function App() {
   const element = document.documentElement;
   const [darkMode, setDarkMode] = useState(false);
-  const [all, setAll] = useState(true);
-  const [active, setActive] = useState(false);
-  const [completed, setCompleted] = useState(false);
+  const [todosList, setTodosList] = useState([]);
 
-  function allListHandler() {
-    setAll(true);
-    setActive(false);
-    setCompleted(false);
-  }
+  const updateTodos = (newTask) => {
+    setTodosList((prev) => {
+      localStorage.setItem("todoTasks", JSON.stringify([...prev, newTask]));
+      return [...prev, newTask];
+    });
+  };
 
-  function activeListHandler() {
-    setActive(true);
-    setAll(false);
-    setCompleted(false);
-  }
+  const taskDeleteHandler = (id) => {
+    setTodosList((prev) => {
+      const filtered = prev.filter((task) => {
+        return task.id !== id;
+      });
+      localStorage.setItem("todoTasks", JSON.stringify(filtered));
+      return filtered;
+    });
+  };
 
-  function completedListHandler() {
-    setCompleted(true);
-    setAll(false);
-    setActive(false);
-  }
+  const taskCompltedHandler = (id) => {
+    setTodosList((prev) => {
+      const completed = prev.map((task) => {
+        if (task.id === id) {
+          return { ...task, completed: !task.completed };
+        } else {
+          return task;
+        }
+      });
+      localStorage.setItem("todoTasks", JSON.stringify(completed));
+      return completed;
+    });
+  };
+
+  const contextValue = {
+    todosList,
+    updateTodos,
+    taskDeleteHandler,
+    taskCompltedHandler,
+  };
 
   useEffect(() => {
-    if(darkMode) {
-      element.classList.add("dark")
+    if (darkMode) {
+      element.classList.add("dark");
     } else {
-      element.classList.remove("dark")
+      element.classList.remove("dark");
     }
-  },[darkMode])
+  }, [darkMode]);
+
+  useEffect(() => {
+    setDarkMode(JSON.parse(localStorage.getItem("todoDarkMode")))
+    setTodosList(JSON.parse(localStorage.getItem("todoTasks")));
+  }, []);
 
   return (
     <div className="App min-h-screen dark:bg-darkPrimary">
-      <header
-        style={{ backgroundImage: "url('/images/day.jpeg')" }}
-        className="h-72 bg-center py-8 md:py-16 px-4"
-      >
-        <div className="sm:max-w-[512px] mx-auto">
-          <div className="flex justify-between items-center mb-8">
-            <h1 className="tracking-widest text-4xl uppercase text-white font-bold px-2">
-              today tasks...
-            </h1>
-            <span
-              className="text-white text-2xl"
-              onClick={() => setDarkMode((prev) => !prev)}
-            >
-              {darkMode ? <BsFillSunFill /> : <BsFillMoonFill />}
-            </span>
-          </div>
-          <div className="bg-white flex items-center p-3 rounded-md dark:bg-darkSecondary dark:text-white">
-            <button className="text-red-500 text-xl w-6 h-6 border-[1px] border-slate-500 rounded-full flex justify-center items-center">
-              <MdCancel />
-            </button>
-            <input
-              className="pl-3 p-1 focus:outline-0 font-medium bg-transparent"
-              placeholder="Create a new task"
-            />
-          </div>
-        </div>
-      </header>
-      <section>
-        <div className="sm:max-w-[512px] mx-auto bg-white p-4 mt-[-50px] shadow-2xl rounded dark:bg-darkSecondary dark:text-white">
-          <p className="mb-4">Total tasks 1, completed 1.</p>
-          <div className="mb-8">
-            <button
-              onClick={allListHandler}
-              className={`${
-                all ? "bg-primary text-white" : "bg-transparent text-primary"
-              } mr-2 border-2 border-primary rounded-md px-3 py-1 font-semibold capitalize`}
-            >
-              all
-            </button>
-            <button
-              onClick={activeListHandler}
-              className={`${
-                active ? "bg-primary text-white" : "bg-transparent text-primary"
-              } mr-2 border-2 border-primary rounded-md px-3 py-1 font-semibold capitalize`}
-            >
-              active
-            </button>
-            <button
-              onClick={completedListHandler}
-              className={`${
-                completed
-                  ? "bg-primary text-white"
-                  : "bg-transparent text-primary"
-              } mr-2 border-2 border-primary rounded-md px-3 py-1 font-semibold capitalize`}
-            >
-              completed
-            </button>
-          </div>
-
-          <div className="">
-            <TodoItem />
-            <TodoItem />
-            <TodoItem />
-          </div>
-        </div>
-      </section>
+      <TodoContext.Provider value={contextValue}>
+        <Home darkMode={darkMode} setDarkMode={setDarkMode} />
+      </TodoContext.Provider>
     </div>
   );
 }
