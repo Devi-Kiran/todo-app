@@ -15,7 +15,7 @@ function Home({ darkMode, setDarkMode }) {
     completed: false,
   });
 
-  const countCompleted = todosList.reduce((count, task) => {
+  const countCompleted = todosList?.reduce((count, task) => {
     if (task.completed === true) {
       count++;
     }
