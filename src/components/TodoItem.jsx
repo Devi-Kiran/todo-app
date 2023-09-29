@@ -28,7 +28,7 @@ function TodoItem({ id, todoTask, completed }) {
             </svg>
           )}
         </button>
-        <p className={`grow ml-3 ${completed && "line-through decoration-2"}`}>
+        <p className={`grow ml-3 capitalize ${completed && "line-through decoration-2"}`}>
           {todoTask}
         </p>
         <button

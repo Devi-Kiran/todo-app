@@ -16,7 +16,7 @@ function Home({ darkMode, setDarkMode }) {
   });
 
   const countCompleted = todosList?.reduce((count, task) => {
-    if (task.completed === true) {
+    if (task?.completed === true) {
       count++;
     }
     return count;
@@ -42,7 +42,7 @@ function Home({ darkMode, setDarkMode }) {
 
   function taskSubmitHandler(e) {
     e.preventDefault();
-    if (task.todoTask) {
+    if (task?.todoTask) {
       let taskCopy = task;
       taskCopy = { ...task, id: Math.random() };
       setTask(taskCopy);
@@ -57,11 +57,11 @@ function Home({ darkMode, setDarkMode }) {
         style={{
           backgroundImage: darkMode
             ? "url('/images/night.jpeg')"
-            : "url('/images/day.jpeg')",
+            : "url('/images/day.jpeg')"
         }}
-        className="bg-center"
+        className="bg-center bg-cover"
       >
-        <div class="h-72 bg-purple-500 py-8 md:py-16 px-4 bg-opacity-50">
+        <div className="h-72 bg-purple-500 py-8 md:py-16 px-4 bg-opacity-50">
           <div className="sm:max-w-[512px] mx-auto">
             <div className="flex justify-between items-start mb-8">
               <h1 className="tracking-widest text-4xl uppercase text-white font-bold px-2">
@@ -90,16 +90,16 @@ function Home({ darkMode, setDarkMode }) {
                   })
                 }
                 className={`text-red-500 ${
-                  !task.todoTask && "cursor-no-drop"
+                  !task?.todoTask && "cursor-no-drop"
                 } text-xl w-6 h-6 border-[1px] border-slate-500 rounded-full flex justify-center items-center`}
               >
-                {task.todoTask && <MdCancel />}
+                {task?.todoTask && <MdCancel />}
               </button>
               <form onSubmit={taskSubmitHandler}>
                 <input
                   className="pl-3 p-1 focus:outline-0 font-medium bg-transparent"
                   placeholder="Create a new task"
-                  value={task.todoTask}
+                  value={task?.todoTask}
                   onChange={(e) =>
                     setTask((prev) => ({ ...prev, todoTask: e.target.value }))
                   }
@@ -148,11 +148,11 @@ function Home({ darkMode, setDarkMode }) {
               {todosList?.map((task) => {
                 return (
                   <TodoItem
-                    key={task.id}
-                    id={task.id}
-                    todoTask={task.todoTask}
-                    active={task.active}
-                    completed={task.completed}
+                    key={task?.id}
+                    id={task?.id}
+                    todoTask={task?.todoTask}
+                    active={task?.active}
+                    completed={task?.completed}
                   />
                 );
               })}
@@ -162,14 +162,14 @@ function Home({ darkMode, setDarkMode }) {
           {(active || completed) && (
             <div>
               {todosList?.map((task) => {
-                if (task.completed === completed) {
+                if (task?.completed === completed) {
                   return (
                     <TodoItem
-                      key={task.id}
-                      id={task.id}
-                      todoTask={task.todoTask}
-                      active={task.active}
-                      completed={task.completed}
+                      key={task?.id}
+                      id={task?.id}
+                      todoTask={task?.todoTask}
+                      active={task?.active}
+                      completed={task?.completed}
                     />
                   );
                 }

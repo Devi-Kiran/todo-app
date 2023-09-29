@@ -11,15 +11,16 @@ function App() {
 
   const updateTodos = (newTask) => {
     setTodosList((prev) => {
-      localStorage.setItem("todoTasks", JSON.stringify([...prev, newTask]));
-      return [...prev, newTask];
+      const updatedData = [...prev, newTask];
+      localStorage.setItem("todoTasks", JSON.stringify(updatedData));
+      return updatedData;
     });
   };
 
   const taskDeleteHandler = (id) => {
     setTodosList((prev) => {
-      const filtered = prev.filter((task) => {
-        return task.id !== id;
+      const filtered = prev?.filter((task) => {
+        return task?.id !== id;
       });
       localStorage.setItem("todoTasks", JSON.stringify(filtered));
       return filtered;
@@ -28,9 +29,9 @@ function App() {
 
   const taskCompltedHandler = (id) => {
     setTodosList((prev) => {
-      const completed = prev.map((task) => {
-        if (task.id === id) {
-          return { ...task, completed: !task.completed };
+      const completed = prev?.map((task) => {
+        if (task?.id === id) {
+          return { ...task, completed: !task?.completed };
         } else {
           return task;
         }
@@ -56,8 +57,12 @@ function App() {
   }, [darkMode]);
 
   useEffect(() => {
-    setDarkMode(JSON.parse(localStorage.getItem("todoDarkMode")))
-    setTodosList(JSON.parse(localStorage.getItem("todoTasks")));
+    setDarkMode(JSON.parse(localStorage.getItem("todoDarkMode")));
+    setTodosList(
+      JSON.parse(localStorage.getItem("todoTasks"))
+        ? JSON.parse(localStorage.getItem("todoTasks"))
+        : []
+    );
   }, []);
 
   return (
