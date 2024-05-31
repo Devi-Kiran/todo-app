@@ -1,6 +1,7 @@
 import "./App.css";
 import React, { useEffect, useState, createContext } from "react";
 import Home from "./pages/HomePage";
+import axios from "axios";
 
 export const TodoContext = createContext();
 
@@ -9,44 +10,18 @@ function App() {
   const [darkMode, setDarkMode] = useState(false);
   const [todosList, setTodosList] = useState([]);
 
-  const updateTodos = (newTask) => {
-    setTodosList((prev) => {
-      const updatedData = [...prev, newTask];
-      localStorage.setItem("todoTasks", JSON.stringify(updatedData));
-      return updatedData;
-    });
-  };
+  useEffect(() => {
+    setDarkMode(JSON.parse(localStorage.getItem("todoDarkMode")));
 
-  const taskDeleteHandler = (id) => {
-    setTodosList((prev) => {
-      const filtered = prev?.filter((task) => {
-        return task?.id !== id;
+    axios
+      .get("http://localhost:9000/todoes")
+      .then((response) => {
+        setTodosList(response.data);
+      })
+      .catch((error) => {
+        console.error("Error fetching data:", error);
       });
-      localStorage.setItem("todoTasks", JSON.stringify(filtered));
-      return filtered;
-    });
-  };
-
-  const taskCompltedHandler = (id) => {
-    setTodosList((prev) => {
-      const completed = prev?.map((task) => {
-        if (task?.id === id) {
-          return { ...task, completed: !task?.completed };
-        } else {
-          return task;
-        }
-      });
-      localStorage.setItem("todoTasks", JSON.stringify(completed));
-      return completed;
-    });
-  };
-
-  const contextValue = {
-    todosList,
-    updateTodos,
-    taskDeleteHandler,
-    taskCompltedHandler,
-  };
+  }, []);
 
   useEffect(() => {
     if (darkMode) {
@@ -56,14 +31,67 @@ function App() {
     }
   }, [darkMode]);
 
-  useEffect(() => {
-    setDarkMode(JSON.parse(localStorage.getItem("todoDarkMode")));
-    setTodosList(
-      JSON.parse(localStorage.getItem("todoTasks"))
-        ? JSON.parse(localStorage.getItem("todoTasks"))
-        : []
-    );
-  }, []);
+  const addTodo = (newTask) => {
+    axios
+      .post("http://localhost:9000/todoes", {
+        ...newTask,
+      })
+      .then((response) => {
+        setTodosList((prev) => {
+          return [...prev, response.data];
+        });
+      })
+      .catch((error) => {
+        console.error("Error posting data:", error);
+      });
+  };
+
+  const taskDeleteHandler = (id) => {
+    axios
+      .delete(`http://localhost:9000/todoes/${id}`)
+      .then((response) => {
+        console.log("Deleted:", response.data);
+        setTodosList((prev) => {
+          return prev?.filter((todo) => {
+            return todo?._id !== id;
+          });
+        });
+      })
+      .catch((error) => {
+        console.error("Error deleting data:", error);
+      });
+  };
+
+  const taskCompltedHandler = (id) => {
+    const todo = todosList.find((todo) => todo?._id == id);
+    const data = { completed: !todo.completed };
+
+    axios
+      .patch(`http://localhost:9000/todoes/${id}`, data)
+      .then((response) => {
+        console.log("Response:", response.data);
+        setTodosList((prev) => {
+          const completed = prev?.map((task) => {
+            if (task?._id === id) {
+              return { ...task, completed: !task?.completed };
+            } else {
+              return task;
+            }
+          });
+          return completed;
+        });
+      })
+      .catch((error) => {
+        console.error("Error updating data:", error);
+      });
+  };
+
+  const contextValue = {
+    todosList,
+    addTodo,
+    taskDeleteHandler,
+    taskCompltedHandler,
+  };
 
   return (
     <div className="App min-h-screen dark:bg-darkPrimary">

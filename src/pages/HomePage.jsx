@@ -5,12 +5,11 @@ import TodoItem from "../components/TodoItem";
 import { TodoContext } from "../App";
 
 function Home({ darkMode, setDarkMode }) {
-  const { todosList, updateTodos } = useContext(TodoContext);
+  const { todosList, addTodo } = useContext(TodoContext);
   const [all, setAll] = useState(true);
   const [active, setActive] = useState(false);
   const [completed, setCompleted] = useState(false);
   const [task, setTask] = useState({
-    id: "",
     todoTask: "",
     completed: false,
   });
@@ -43,11 +42,9 @@ function Home({ darkMode, setDarkMode }) {
   function taskSubmitHandler(e) {
     e.preventDefault();
     if (task?.todoTask) {
-      let taskCopy = task;
-      taskCopy = { ...task, id: Math.random() };
-      setTask(taskCopy);
-      updateTodos(taskCopy);
-      setTask({ id: "", todoTask: "", completed: false });
+      setTask(task);
+      addTodo(task);
+      setTask({ todoTask: "", completed: false });
     }
   }
 
@@ -57,7 +54,7 @@ function Home({ darkMode, setDarkMode }) {
         style={{
           backgroundImage: darkMode
             ? "url('/images/night.jpeg')"
-            : "url('/images/day.jpeg')"
+            : "url('/images/day.jpeg')",
         }}
         className="bg-center bg-cover"
       >
@@ -148,8 +145,8 @@ function Home({ darkMode, setDarkMode }) {
               {todosList?.map((task) => {
                 return (
                   <TodoItem
-                    key={task?.id}
-                    id={task?.id}
+                    key={task?._id}
+                    id={task?._id}
                     todoTask={task?.todoTask}
                     active={task?.active}
                     completed={task?.completed}
@@ -159,23 +156,20 @@ function Home({ darkMode, setDarkMode }) {
             </div>
           )}
 
-          {(active || completed) && (
-            <div>
-              {todosList?.map((task) => {
-                if (task?.completed === completed) {
-                  return (
-                    <TodoItem
-                      key={task?.id}
-                      id={task?.id}
-                      todoTask={task?.todoTask}
-                      active={task?.active}
-                      completed={task?.completed}
-                    />
-                  );
-                }
-              })}
-            </div>
-          )}
+          {todosList?.map((task) => {
+            if ((active && !task.completed) || (completed && task.completed)) {
+              return (
+                <TodoItem
+                  key={task._id}
+                  id={task._id}
+                  todoTask={task.todoTask}
+                  active={task.active}
+                  completed={task.completed}
+                />
+              );
+            }
+            return null;
+          })}
         </div>
       </section>
     </>
